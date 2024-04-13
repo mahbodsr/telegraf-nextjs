@@ -11,9 +11,15 @@ export interface IVideos {
 }
 
 export default async function Home() {
-  const videos = JSON.parse(
-    await fs.promises.readFile(videosPath, "utf-8")
-  ) as IVideos;
+  let videos;
+  try {
+    videos = JSON.parse(
+      await fs.promises.readFile(videosPath, "utf-8")
+    ) as IVideos;
+  } catch {
+    videos = {};
+  }
   const videosArr = Object.entries(videos);
+  if(videosArr.length === 0) return "No videos found."
   return <CustomSwiper videos={videosArr} />;
 }
