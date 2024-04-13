@@ -76,7 +76,7 @@ app.get("/phonecode/:phonecode", async (req: Request, res: Response) => {
 
 const apiId = 21039908;
 const apiHash = "b7bbb66a8b2229ec4e235170077f79ad";
-const storeSession = new StoreSession("mahbodsr_second"); // fill this later with the value from session.save()
+const storeSession = new MemorySession(); // fill this later with the value from session.save()
 
 const getPhoneCode = () => {
   console.log("you should now enter phonecode.");
@@ -87,9 +87,7 @@ const getPhoneCode = () => {
 
 (async () => {
   const videos = new VideosMap(videosJsonPath);
-  const client = new TelegramClient(storeSession, apiId, apiHash, {
-    proxy: { ip: "127.0.0.1", port: 10808, socksType: 5 },
-  });
+  const client = new TelegramClient(storeSession, apiId, apiHash, {});
   app.use("/stream/:chatId/:messageId", async (req, res) => {
     const range = req.headers.range;
     if (!range) {
