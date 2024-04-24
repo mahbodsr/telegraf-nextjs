@@ -32,7 +32,7 @@ const dev = process.env.NODE_ENV !== "production";
 
 const videosUrl = `https://${HOST}`;
 
-const nextApp = next({ dev: true });
+const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 const app = express();
 
