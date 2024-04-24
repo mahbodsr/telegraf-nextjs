@@ -19,7 +19,7 @@ export default async function Home() {
   } catch {
     videos = {};
   }
-  const videosArr = Object.entries(videos);
+  const videosArr = Object.entries(videos).reverse();
   if(videosArr.length === 0) return "No videos found."
   return <CustomSwiper videos={videosArr} />;
 }
