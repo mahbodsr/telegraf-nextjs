@@ -69,10 +69,10 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
 (async () => {
   const videos = new VideosMap(videosJsonPath);
   const client = new TelegramClient(
-    new StoreSession("mahbodsr_second"),
+    new MemorySession(),
     +process.env.API_ID!,
     process.env.API_HASH!,
-    { proxy: { ip: "127.0.0.1", port: 10808, socksType: 5 } }
+    {}
   );
   app.use("/stream/:chatId/:messageId", async (req, res) => {
     const range = req.headers.range;
@@ -121,14 +121,14 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
     handle(req, res, parsedUrl);
   });
 
-  console.log("NOT STARTED")
+  console.log("NOT STARTED");
   await nextApp.prepare();
   app.listen(PORT, () => {
     console.log(
       `HTTP Server is running.\nYou can now watch videos on ${videosUrl}`
     );
   });
-  console.log("STARTED")
+  console.log("STARTED");
   await client.start({
     phoneNumber: "+989336146174",
     phoneCode: getPhoneCode(event),
