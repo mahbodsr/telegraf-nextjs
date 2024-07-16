@@ -37,4 +37,4 @@ next-env.d.ts
 dist/**
 mahbodsr_second/**
 videos.json
-.env
+*.env
