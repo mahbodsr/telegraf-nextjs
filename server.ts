@@ -131,7 +131,7 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
   });
   console.log("STARTED");
   await client.start({
-    phoneNumber: "+989336146174",
+    phoneNumber: process.env.PHONE_NUMBER!,
     phoneCode: getPhoneCode(event),
     onError: (err) => console.log(err),
   });
