@@ -51,7 +51,8 @@ const CustomSwiper = ({ videos }: { videos: TVideos }) => {
             caption={video.caption}
             filename={video.nickName}
             createdAt={video.createdAt}
-            link={link}
+            link={video.redirect ?? link}
+            buttonText={video.redirect ? "Go to link" : "Watch"}
           />
         </SwiperSlide>
       ))}

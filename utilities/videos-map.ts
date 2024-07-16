@@ -7,7 +7,8 @@ interface Value {
   chatId: ChatGetter["chatId"];
   messageId: number;
   caption: string;
-  createdAt: number
+  createdAt: number;
+  redirect?: string;
 }
 
 export default class VideosMap {

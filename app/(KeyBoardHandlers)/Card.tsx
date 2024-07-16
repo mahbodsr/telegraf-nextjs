@@ -7,10 +7,12 @@ const Card = ({
   caption,
   link,
   createdAt,
+  buttonText,
 }: {
   filename: string;
   caption: string;
   link: string;
+  buttonText: string;
   createdAt: number;
 }) => {
   return (
@@ -20,7 +22,8 @@ const Card = ({
           {filename}
         </div>
         <Badge color="primary" suppressHydrationWarning={true}>
-          Expires in <CountDown expiresAt={new Date(createdAt + 86400000).getTime()} />
+          Expires in{" "}
+          <CountDown expiresAt={new Date(createdAt + 86400000).getTime()} />
         </Badge>
       </h1>
       <div className="text-xl whitespace-pre text-wrap flex-1 rtl overflow-auto text-ellipsis">
@@ -33,7 +36,7 @@ const Card = ({
         color="secondary"
         soft
       >
-        Watch
+        {buttonText }
       </Button>
     </div>
   );

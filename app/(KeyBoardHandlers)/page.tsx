@@ -7,7 +7,12 @@ import CustomSwiper from "./CustomSwiper";
 const videosPath = path.join(process.cwd(), "videos.json");
 
 export interface IVideos {
-  [key: string]: { nickName: string; caption: string; createdAt: number };
+  [key: string]: {
+    nickName: string;
+    caption: string;
+    createdAt: number;
+    redirect: string;
+  };
 }
 
 export default async function Home() {
@@ -20,6 +25,6 @@ export default async function Home() {
     videos = {};
   }
   const videosArr = Object.entries(videos).reverse();
-  if(videosArr.length === 0) return "No videos found."
+  if (videosArr.length === 0) return "No videos found.";
   return <CustomSwiper videos={videosArr} />;
 }

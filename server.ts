@@ -18,6 +18,7 @@ import "./utilities/job";
 import saveVideo from "./services/save-video";
 import changeNickName from "./services/change-nickname";
 import getPhoneCode from "./utilities/get-phonecode";
+import addLink from "./services/add-link";
 
 const event = new EventEmitter();
 
@@ -139,10 +140,15 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
 
   client.addEventHandler(async (event: NewMessageEvent) => {
     if (event.chatId === undefined) return;
-    if (event.message.video?.mimeType === "video/mp4" && !event.message.gif) {
+    const mimeType = event.message.video?.mimeType;
+    if (
+      (mimeType === "video/mp4" || mimeType === "video/x-matroska") &&
+      !event.message.gif
+    ) {
       saveVideo(event, videos, videosUrl);
     } else if (event.message.replyTo) {
       changeNickName(event, videos, videosUrl);
-    }
+    } else if (event.message.text.startsWith("/link"))
+      addLink(event, videos, videosUrl);
   }, new NewMessage({ chats: allowedUserIds }));
 })();
