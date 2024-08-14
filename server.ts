@@ -2,12 +2,11 @@ import next from "next";
 import { parse } from "url";
 import { TelegramClient, Api } from "telegram";
 import ip from "ip";
-import { MemorySession, StoreSession } from "telegram/sessions";
+import { MemorySession } from "telegram/sessions";
 import { NewMessage, NewMessageEvent } from "telegram/events";
 import path from "path";
-import express from "express";
+import express, { NextFunction } from "express";
 import dotenv from "dotenv";
-import fs from "fs";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { Request, Response } from "express";
@@ -19,6 +18,12 @@ import saveVideo from "./services/save-video";
 import changeNickName from "./services/change-nickname";
 import getPhoneCode from "./utilities/get-phonecode";
 import addLink from "./services/add-link";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+
+interface IUsers {
+  [key: string]: { password: string } | undefined;
+}
 
 const event = new EventEmitter();
 
@@ -27,7 +32,6 @@ dotenv.config();
 const allowedUserIds = process.env.ALLOWED_USER_IDS!.split(",");
 const PORT = process.env.PORT!;
 const HOST = process.env.DOMAIN ?? ip.address();
-const srcPath = path.join(process.cwd(), "src");
 const videosJsonPath = path.join(process.cwd(), "videos.json");
 const dev = process.env.NODE_ENV !== "production";
 
@@ -37,32 +41,86 @@ const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 const app = express();
 
-app.use(bodyParser.json());
-app.use(cors({ origin: true }));
-app.post("/add-link", async (req: Request, res: Response) => {
-  const linksFile = await fs.promises.readFile(
-    path.join(srcPath, "links.json"),
-    {
-      encoding: "utf-8",
+const users: IUsers = {
+  srfamily: {
+    password: "marzdaran44215732",
+  },
+  norouzi: { password: "mobina1647" },
+  shadkaam: { password: "ariya4479" },
+};
+
+const SECRET_KEY = process.env.SECRET_KEY!;
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: string | JwtPayload;
     }
-  );
-  const linksJson = JSON.parse(linksFile) as [{ link: string; text: string }];
-  linksJson.push(req.body);
-  await fs.promises.writeFile(
-    path.join(srcPath, "links.json"),
-    JSON.stringify(linksJson)
-  );
-  res.status(200).end();
+  }
+}
+
+const Regex = /^\/(_next\/static|_next\/image|favicon\.ico|login)/;
+
+const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies.token as string;
+
+  if (token) {
+    jwt.verify(token, SECRET_KEY, (err, decoded) => {
+      if (err) {
+        return res.redirect("/login");
+      }
+
+      // Check if the token has expired
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (
+        (decoded as JwtPayload).exp &&
+        (decoded as JwtPayload).exp! < currentTime
+      ) {
+        return res.redirect("/login"); // Token has expired
+      }
+
+      req.user = decoded;
+      next();
+    });
+  } else {
+    res.redirect("/login");
+  }
+};
+
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(cors({ origin: true }));
+app.post("/api/login", (req: Request, res: Response) => {
+  const { username, password } = req.body as Record<string, string>;
+
+  const user = users[username];
+  // Check if the username and password match the simulated user
+  if (user?.password === password) {
+    // Generate a JWT token with a 7-day expiration
+    const token = jwt.sign({ username }, SECRET_KEY, {
+      expiresIn: "7d",
+    });
+    res.status(200).cookie("token", token).end();
+    res.cookie("token", token);
+  } else {
+    res.sendStatus(401);
+  }
 });
-app.delete("/reset-items", async (req: Request, res: Response) => {
-  await fs.promises.writeFile(
-    path.join(srcPath, "links.json"),
-    JSON.stringify([])
-  );
-  res.status(200).end();
-});
-app.get("/phonecode/:phonecode", async (req: Request, res: Response) => {
+app.get("/api/phonecode/:phonecode", async (req: Request, res: Response) => {
   event.emit("phonecode", req.params.phonecode);
+});
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const parsedUrl = parse(req.url!, true);
+  const { pathname } = parsedUrl;
+
+  if (Regex.test(pathname ?? "")) return handle(req, res, parsedUrl);
+
+  authenticateJWT(req, res, next);
+});
+
+app.use((req: Request, res: Response) => {
+  const parsedUrl = parse(req.url!, true);
+  handle(req, res, parsedUrl);
 });
 
 console.log(+process.env.API_ID!, process.env.API_HASH!);
@@ -73,9 +131,10 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
     new MemorySession(),
     +process.env.API_ID!,
     process.env.API_HASH!,
-    {}
+    { }
   );
-  app.use("/stream/:chatId/:messageId", async (req, res) => {
+
+  app.use("/api/stream/:chatId/:messageId", async (req, res) => {
     const range = req.headers.range;
     if (!range) {
       return res.status(400).send("Requires Range header");
@@ -116,10 +175,6 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
     };
     res.writeHead(206, headers);
     res.end(chunks);
-  });
-  app.use((req: Request, res: Response) => {
-    const parsedUrl = parse(req.url!, true);
-    handle(req, res, parsedUrl);
   });
 
   console.log("NOT STARTED");

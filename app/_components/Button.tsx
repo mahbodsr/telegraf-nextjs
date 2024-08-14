@@ -13,8 +13,7 @@ const NormalTheme = {
 const SoftTheme = {
   primary:
     "hover:bg-primary-100 bg-primary-50 text-primary-600 fill-primary-600",
-  secondary:
-    "hover:bg-black/20 bg-black/10 text-black fill-black",
+  secondary: "hover:bg-black/20 bg-black/10 text-black fill-black",
   red: "hover:bg-red-200 bg-red-100 text-red-600 fill-red-600",
 };
 
@@ -55,7 +54,7 @@ function Button<T extends Href | undefined>({
 }: Props<T>) {
   const classNames = cn(
     className,
-    "inline-flex justify-center text-base items-center disabled:opacity-75 disabled:pointer-events-none font-bold",
+    "inline-flex justify-center text-base items-center disabled:opacity-75 disabled:pointer-events-none font-bold space-x-2",
     {
       [SoftTheme[color]]: soft,
       [NormalTheme[color]]: !soft,
@@ -73,11 +72,11 @@ function Button<T extends Href | undefined>({
   const childrenAndLoading = (
     <>
       {isLoading ? (
-        <Spinner className="text-inherit ml-2" />
+        <Spinner className="text-inherit mr-2 w-6 h-6" />
       ) : (
         icon?.type === "trail" && <icon.Component className="ml-2" />
       )}
-      {children}
+      <span>{children}</span>
       {icon?.type === "lead" && !isLoading && (
         <icon.Component className="mr-2" />
       )}

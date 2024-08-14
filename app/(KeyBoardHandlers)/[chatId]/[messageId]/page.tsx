@@ -18,7 +18,7 @@ const Component = ({
   return (
     <video autoPlay controls ref={videoRef}>
       <source
-        src={`/stream/${params.chatId}/${params.messageId}`}
+        src={`/api/stream/${params.chatId}/${params.messageId}`}
         type="video/mp4"
       />
     </video>
