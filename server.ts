@@ -47,6 +47,7 @@ const users: IUsers = {
   },
   norouzi: { password: "mobina1647" },
   shadkaam: { password: "ariya4479" },
+  mahbodsr: {password: "imtheoneandonly"}
 };
 
 const SECRET_KEY = process.env.SECRET_KEY!;
