@@ -117,11 +117,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   authenticateJWT(req, res, next);
 });
 
-app.use((req: Request, res: Response) => {
-  const parsedUrl = parse(req.url!, true);
-  handle(req, res, parsedUrl);
-});
-
 console.log(+process.env.API_ID!, process.env.API_HASH!);
 
 (async () => {
@@ -174,6 +169,11 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
     };
     res.writeHead(206, headers);
     res.end(chunks);
+  });
+
+  app.use((req: Request, res: Response) => {
+    const parsedUrl = parse(req.url!, true);
+    handle(req, res, parsedUrl);
   });
 
   console.log("NOT STARTED");
