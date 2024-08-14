@@ -101,7 +101,6 @@ app.post("/api/login", (req: Request, res: Response) => {
       expiresIn: "7d",
     });
     res.status(200).cookie("token", token).end();
-    res.cookie("token", token);
   } else {
     res.sendStatus(401);
   }
