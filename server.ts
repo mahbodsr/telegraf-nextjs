@@ -47,7 +47,8 @@ const users: IUsers = {
   },
   norouzi: { password: "mobina1647" },
   shadkaam: { password: "ariya4479" },
-  mahbodsr: {password: "imtheoneandonly"}
+  mahbodsr: { password: "imtheoneandonly" },
+  babakarami: { password: "beautifulmehi9795" },
 };
 
 const SECRET_KEY = process.env.SECRET_KEY!;
@@ -126,7 +127,7 @@ console.log(+process.env.API_ID!, process.env.API_HASH!);
     new MemorySession(),
     +process.env.API_ID!,
     process.env.API_HASH!,
-    { }
+    {}
   );
 
   app.use("/api/stream/:chatId/:messageId", async (req, res) => {
