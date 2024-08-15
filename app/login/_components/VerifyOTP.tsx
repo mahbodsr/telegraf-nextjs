@@ -68,6 +68,12 @@ const VerifyOTP = ({ username }: IProps) => {
     const previousSibling =
       currentTarget.previousSibling as HTMLInputElement | null;
     const nextSibling = currentTarget.nextSibling as HTMLInputElement | null;
+
+    if (Number.isNaN(Number(event.key))) {
+      event.preventDefault();
+      return;
+    }
+
     if (event.key === "ArrowLeft" && previousSibling) {
       event.preventDefault();
       previousSibling.select();
@@ -87,7 +93,11 @@ const VerifyOTP = ({ username }: IProps) => {
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const currentTarget = event.currentTarget;
     const value = currentTarget.value;
-    if (Number.isNaN(Number(value))) return;
+
+    if (Number.isNaN(Number(value))) {
+      event.preventDefault();
+      return;
+    }
     const nextSibling = currentTarget.nextSibling as HTMLInputElement | null;
     const previousSibling =
       currentTarget.previousSibling as HTMLInputElement | null;
@@ -121,9 +131,9 @@ const VerifyOTP = ({ username }: IProps) => {
               <input
                 {...field}
                 onClick={(e) => e.currentTarget.select()}
-                type="text"
+                type="number"
                 maxLength={1}
-                className="w-12 h-12 text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-12 h-12 text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary no-arrows"
                 onInput={handleChange}
                 onKeyDown={handleKeyDown}
               />
