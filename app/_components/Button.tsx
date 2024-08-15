@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { ComponentProps, ComponentPropsWithoutRef, Fragment } from "react";
+import React, {
+  ComponentProps,
+  ComponentPropsWithoutRef,
+  forwardRef,
+} from "react";
 import cn from "classnames";
 import Spinner from "./Spinner";
 
@@ -30,6 +34,7 @@ interface BaseProps {
     type: "trail" | "lead";
   };
 }
+
 interface LinkProps
   extends Omit<ComponentProps<typeof Link>, "color">,
     BaseProps {}
@@ -41,62 +46,80 @@ type Props<T extends Href | undefined> = T extends Href
   ? LinkProps
   : ButtonProps;
 
-function Button<T extends Href | undefined>({
-  icon,
-  rounded,
-  children,
-  className,
-  isLoading,
-  soft = false,
-  small = false,
-  color = "primary",
-  ...props
-}: Props<T>) {
-  const classNames = cn(
-    className,
-    "inline-flex justify-center text-base items-center disabled:opacity-75 disabled:pointer-events-none font-bold space-x-2",
+const Button = forwardRef<
+  HTMLButtonElement | HTMLAnchorElement,
+  Props<Href | undefined>
+>(
+  (
     {
-      [SoftTheme[color]]: soft,
-      [NormalTheme[color]]: !soft,
-      "py-2.5": !small,
-      "py-1 text-xs": small,
-      "rounded-md": !rounded,
-      "rounded-full": rounded,
-      "px-3.5": !small && !rounded,
-      "px-2.5": !small && rounded,
-      "px-2": small && !rounded,
-      "px-1": small && rounded,
-    }
-  );
-
-  const childrenAndLoading = (
-    <>
-      {isLoading ? (
-        <Spinner className="text-inherit mr-2 w-6 h-6" />
-      ) : (
-        icon?.type === "trail" && <icon.Component className="ml-2" />
-      )}
-      <span>{children}</span>
-      {icon?.type === "lead" && !isLoading && (
-        <icon.Component className="mr-2" />
-      )}
-    </>
-  );
-  if ("href" in props)
-    return (
-      <Link className={classNames} {...(props as LinkProps)}>
-        {childrenAndLoading}
-      </Link>
+      icon,
+      rounded,
+      children,
+      className,
+      isLoading,
+      soft = false,
+      small = false,
+      color = "primary",
+      ...props
+    },
+    ref
+  ) => {
+    const classNames = cn(
+      className,
+      "inline-flex justify-center text-base items-center disabled:opacity-75 disabled:pointer-events-none font-bold space-x-2",
+      {
+        [SoftTheme[color]]: soft,
+        [NormalTheme[color]]: !soft,
+        "py-2.5": !small,
+        "py-1 text-xs": small,
+        "rounded-md": !rounded,
+        "rounded-full": rounded,
+        "px-3.5": !small && !rounded,
+        "px-2.5": !small && rounded,
+        "px-2": small && !rounded,
+        "px-1": small && rounded,
+      }
     );
-  return (
-    <button
-      className={classNames}
-      disabled={isLoading}
-      {...(props as ButtonProps)}
-    >
-      {childrenAndLoading}
-    </button>
-  );
-}
+
+    const childrenAndLoading = (
+      <>
+        {isLoading ? (
+          <Spinner className="text-inherit mr-2 w-6 h-6" />
+        ) : (
+          icon?.type === "trail" && <icon.Component className="ml-2 w-6 h-6" />
+        )}
+        <span>{children}</span>
+        {icon?.type === "lead" && !isLoading && (
+          <icon.Component className="mr-2 w-6 h-6" />
+        )}
+      </>
+    );
+
+    if ("href" in props) {
+      return (
+        <Link
+          className={classNames}
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          {...(props as LinkProps)}
+        >
+          {childrenAndLoading}
+        </Link>
+      );
+    }
+
+    return (
+      <button
+        className={classNames}
+        disabled={isLoading}
+        ref={ref as React.Ref<HTMLButtonElement>}
+        {...(props as ButtonProps)}
+      >
+        {childrenAndLoading}
+      </button>
+    );
+  }
+);
+
+Button.displayName = "Button";
 
 export default Button;
