@@ -209,7 +209,9 @@ app.get("/api/phonecode/:phonecode", async (req: Request, res: Response) => {
       tries: 0,
     };
 
-    client.sendMessage(username, {
+    const id = users[username].id
+
+    client.sendMessage(id, {
       message: `Your code is: <spoiler>${otp}</spoiler>`,
       parseMode: "html",
     });
